@@ -71,14 +71,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         btn.addEventListener('click', () => {
             const lang = btn.getAttribute('data-lang');
             if (lang !== currentLang) {
-                currentLang = lang;
-                loadTranslations(currentLang);
-
-                // 更新按鈕狀態
-                document.querySelectorAll('.lang-btn').forEach(b => {
-                    b.classList.remove('active');
-                });
-                btn.classList.add('active');
+                localStorage.setItem('preferredLanguage', lang);
+                // 重新載入頁面
+                window.location.reload();
             }
         });
     });
@@ -143,6 +138,17 @@ let saveTextBtn = null;
 let cancelTextBtn = null;
 let modalOverlay = null;
 let tabs = null;
+
+// 縮放相關變數
+let scale = 1;
+let currentX = 0;
+let currentY = 0;
+let isPointerDown = false;
+let startX;
+let startY;
+let startDistance;
+let zoomControls;
+let rotationAngle = 0; // 新增：旋轉角度變數
 
 // 初始化
 document.addEventListener('DOMContentLoaded', function() {
@@ -219,6 +225,146 @@ document.addEventListener('DOMContentLoaded', function() {
     // 設置文檔級別的事件監聽器，用於拖曳和調整大小
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
+
+    // 縮放按鈕事件
+    const zoomInBtn = document.getElementById('zoom-in');
+    const zoomOutBtn = document.getElementById('zoom-out');
+    const zoomResetBtn = document.getElementById('zoom-reset');
+    const zoomLevel = document.querySelector('.zoom-level');
+
+    // 縮放按鈕事件
+    zoomInBtn.addEventListener('click', () => {
+        setZoom(scale * 1.2);
+    });
+
+    zoomOutBtn.addEventListener('click', () => {
+        setZoom(scale / 1.2);
+    });
+
+    zoomResetBtn.addEventListener('click', () => {
+        resetTransform();
+        zoomResetBtn.disabled = true;
+    });
+
+    // 旋轉按鈕事件
+    const rotateBtn = document.getElementById('rotate-btn');
+    rotateBtn.addEventListener('click', () => {
+        rotationAngle = (rotationAngle + 45) % 360;
+        updateTransform();
+    });
+
+    // 觸控事件處理
+    imageWrapper.addEventListener('pointerdown', handlePointerDown);
+    imageWrapper.addEventListener('pointermove', handlePointerMove);
+    imageWrapper.addEventListener('pointerup', handlePointerUp);
+    imageWrapper.addEventListener('pointercancel', handlePointerUp);
+    imageWrapper.addEventListener('wheel', handleWheel, { passive: false });
+
+    // 手勢縮放事件
+    imageWrapper.addEventListener('gesturestart', handleGestureStart);
+    imageWrapper.addEventListener('gesturechange', handleGestureChange);
+    imageWrapper.addEventListener('gestureend', handleGestureEnd);
+
+    function handlePointerDown(e) {
+        // 如果點擊的是裁切框、去背區域或文字框，不觸發圖片移動
+        if (e.target.classList.contains('cropper') ||
+            e.target.classList.contains('eraser') ||
+            e.target.classList.contains('text-box') ||
+            e.target.classList.contains('resizer')) {
+            return;
+        }
+
+        isPointerDown = true;
+        startX = e.clientX - currentX;
+        startY = e.clientY - currentY;
+        imageWrapper.setPointerCapture(e.pointerId);
+    }
+
+    function handlePointerMove(e) {
+        // 如果正在拖曳裁切框等元素，不進行圖片移動
+        if (isDragging || isResizing) {
+            return;
+        }
+
+        if (!isPointerDown) return;
+        currentX = e.clientX - startX;
+        currentY = e.clientY - startY;
+        updateTransform();
+    }
+
+    function handlePointerUp() {
+        isPointerDown = false;
+    }
+
+    function handleWheel(e) {
+        e.preventDefault();
+        const delta = e.deltaY * -0.01;
+        const newScale = Math.min(Math.max(0.1, scale * (1 + delta)), 5);
+        setZoom(newScale);
+    }
+
+    function handleGestureStart(e) {
+        e.preventDefault();
+        startDistance = null;
+    }
+
+    function handleGestureChange(e) {
+        e.preventDefault();
+        if (startDistance === null) {
+            startDistance = e.scale;
+            return;
+        }
+        const newScale = Math.min(Math.max(0.1, scale * (e.scale / startDistance)), 5);
+        setZoom(newScale);
+        startDistance = e.scale;
+    }
+
+    function handleGestureEnd(e) {
+        e.preventDefault();
+    }
+
+    function setZoom(newScale) {
+        scale = newScale;
+        updateTransform();
+        zoomLevel.textContent = `${Math.round(scale * 100)}%`;
+
+        // 更新按鈕狀態
+        zoomInBtn.disabled = scale >= 5;
+        zoomOutBtn.disabled = scale <= 0.1;
+        zoomResetBtn.disabled = scale === 1 && currentX === 0 && currentY === 0 && rotationAngle === 0;
+        rotateBtn.disabled = false; // 啟用旋轉按鈕
+    }
+
+    function updateTransform() {
+        // 計算縮放和旋轉後的位置偏移
+        const imgWidth = img.naturalWidth;
+        const imgHeight = img.naturalHeight;
+        const containerWidth = imageContainer.clientWidth;
+        const containerHeight = imageContainer.clientHeight;
+
+        // 計算圖片在容器中的中心位置
+        const centerX = (containerWidth - imgWidth) / 2;
+        const centerY = (containerHeight - imgHeight) / 2;
+
+        imageWrapper.style.transform = `translate(${currentX + centerX}px, ${currentY + centerY}px) rotate(${rotationAngle}deg) scale(${scale})`;
+    }
+
+    function resetTransform() {
+        scale = 1;
+        currentX = 0;
+        currentY = 0;
+        rotationAngle = 0;
+        updateTransform();
+        zoomLevel.textContent = '100%';
+    }
+
+    // 當圖片載入時啟用控制項
+    img.addEventListener('load', () => {
+        zoomInBtn.disabled = false;
+        zoomOutBtn.disabled = false;
+        zoomResetBtn.disabled = true;
+        rotateBtn.disabled = false;
+    });
 });
 
 // 切換選項卡
@@ -270,6 +416,10 @@ function handleFileChange(e) {
     const reader = new FileReader();
     reader.onload = function(event) {
         img.onload = function() {
+            // 隱藏上傳提示，顯示圖片
+            document.getElementById('upload-hint').classList.remove('show');
+            imageWrapper.style.display = 'inline-block';
+
             // 顯示圖片並啟用按鈕
             img.style.display = 'block';
             addCropperBtn.disabled = false;
@@ -308,8 +458,9 @@ function handleFileChange(e) {
 
 // 重置圖片容器
 function resetImageContainer() {
-    imageWrapper.style.width = img.naturalWidth + 'px';
-    imageWrapper.style.height = img.naturalHeight + 'px';
+    // 移除固定寬高設置，使用 CSS 中的 width: 100% 設置
+    imageWrapper.style.width = '';
+    imageWrapper.style.height = '';
 }
 
 // 更新長寬比例
@@ -779,6 +930,8 @@ function startDrag(e, type) {
     dragStartX = e.clientX;
     dragStartY = e.clientY;
 
+    // 停止事件冒泡，防止觸發圖片的移動
+    e.stopPropagation();
     e.preventDefault();
 }
 

@@ -1,5 +1,9 @@
 {
     "title": "多功能圖片編輯與裁切工具",
+    "hints": {
+        "uploadImage": "請選擇或拖曳圖片至此處",
+        "supportFormat": "支援的格式：JPG、PNG、GIF、WebP"
+    },
     "tabs": {
         "crop": "裁切模式",
         "erase": "去背模式",

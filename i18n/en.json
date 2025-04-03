@@ -1,5 +1,5 @@
 {
-    "title": "Multi-functional Image Editor and Cropper",
+    "title": "Multi-functional Image Editor & Cropper",
     "tabs": {
         "crop": "Crop Mode",
         "erase": "Erase Mode",
@@ -47,5 +47,9 @@
     "fontWeights": {
         "normal": "Normal",
         "bold": "Bold"
+    },
+    "hints": {
+        "uploadImage": "Click or drag an image here to upload",
+        "supportFormat": "Supported formats: JPG, PNG, GIF, WebP"
     }
 }

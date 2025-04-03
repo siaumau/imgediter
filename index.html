@@ -135,11 +135,41 @@
             max-height: 600px;
             background-color: #f8fafc;
             padding: 20px;
+            touch-action: none;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .upload-hint {
+            text-align: center;
+            color: #94a3b8;
+            display: none;
+        }
+        .upload-hint i {
+            font-size: 4em;
+            margin-bottom: 15px;
+            color: #cbd5e1;
+        }
+        .upload-hint p {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+        .upload-hint.show {
+            display: block;
         }
         .image-wrapper {
             position: relative;
-            display: inline-block;
+            display: none;
+            width: 100%;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform-origin: center center;
+            will-change: transform;
+        }
+        #source-image, #edit-canvas {
+            max-width: 100%;
+            height: auto;
+            display: block;
         }
         .cropper {
             position: absolute;
@@ -331,6 +361,41 @@
             border: 1px solid #e2e8f0;
         }
 
+        /* 縮放控制項 */
+        .zoom-controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .zoom-controls button {
+            padding: 8px;
+            font-size: 1.2em;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .zoom-controls button:disabled {
+            background-color: #bdc3c7;
+        }
+        .zoom-level {
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
         /* 響應式設計 */
         @media screen and (max-width: 768px) {
             body {
@@ -487,6 +552,20 @@
             .cropper-index, .eraser-index, .text-index {
                 font-size: 10px;
                 padding: 1px 6px;
+            }
+            .zoom-controls {
+                bottom: 10px;
+                right: 10px;
+            }
+            .zoom-controls button {
+                padding: 6px;
+                font-size: 1em;
+            }
+            .upload-hint i {
+                font-size: 3em;
+            }
+            .upload-hint p {
+                font-size: 1em;
             }
         }
 
@@ -775,9 +854,29 @@
         </div>
 
         <div class="image-container" id="image-container">
+            <div class="upload-hint show" id="upload-hint">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p data-i18n="hints.uploadImage">請選擇或拖曳圖片至此處</p>
+                <p data-i18n="hints.supportFormat">支援的格式：JPG、PNG、GIF、WebP</p>
+            </div>
             <div class="image-wrapper" id="image-wrapper">
-                <img id="source-image" style="display: none;">
-                <canvas id="edit-canvas" style="display: none;"></canvas>
+                <img id="source-image" style="display: block; width: 100%; height: auto;">
+                <canvas id="edit-canvas" style="display: none; width: 100%; height: auto;"></canvas>
+            </div>
+            <div class="zoom-controls">
+                <button id="zoom-out" disabled>
+                    <i class="fas fa-search-minus"></i>
+                </button>
+                <span class="zoom-level">100%</span>
+                <button id="zoom-in" disabled>
+                    <i class="fas fa-search-plus"></i>
+                </button>
+                <button id="zoom-reset" disabled>
+                    <i class="fas fa-undo"></i>
+                </button>
+                <button id="rotate-btn" disabled>
+                    <i class="fas fa-sync-alt"></i>
+                </button>
             </div>
         </div>
     </div>
