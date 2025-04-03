@@ -1,3 +1,76 @@
+// 語言設定
+let currentLang = 'zh-TW';
+let translations = {};
+
+// 載入語言檔案
+async function loadTranslations(lang) {
+    try {
+        const response = await fetch(`i18n/${lang}.json`);
+        translations = await response.json();
+        updateUI();
+    } catch (error) {
+        console.error('Error loading translations:', error);
+    }
+}
+
+// 更新 UI 文字
+function updateUI() {
+    // 更新所有帶有 data-i18n 屬性的元素
+    document.querySelectorAll('[data-i18n]').forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        const keys = key.split('.');
+        let value = translations;
+
+        for (const k of keys) {
+            value = value[k];
+            if (!value) break;
+        }
+
+        if (value) {
+            element.textContent = value;
+        }
+    });
+
+    // 更新所有帶有 data-i18n-placeholder 屬性的元素
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+        const key = element.getAttribute('data-i18n-placeholder');
+        const keys = key.split('.');
+        let value = translations;
+
+        for (const k of keys) {
+            value = value[k];
+            if (!value) break;
+        }
+
+        if (value) {
+            element.placeholder = value;
+        }
+    });
+}
+
+// 初始化語言設定
+document.addEventListener('DOMContentLoaded', () => {
+    // 載入預設語言
+    loadTranslations(currentLang);
+
+    // 設定語言切換按鈕事件
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const lang = btn.getAttribute('data-lang');
+            if (lang !== currentLang) {
+                currentLang = lang;
+                loadTranslations(currentLang);
+
+                // 更新按鈕狀態
+                document.querySelectorAll('.lang-btn').forEach(b => {
+                    b.classList.remove('active');
+                });
+                btn.classList.add('active');
+            }
+        });
+    });
+});
+
 // 全域變數
 let sourceImage = null;
 let currentMode = 'crop'; // 'crop', 'erase', 'text'

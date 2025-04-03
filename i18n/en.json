@@ -1,0 +1,51 @@
+{
+    "title": "Multi-functional Image Editor and Cropper",
+    "tabs": {
+        "crop": "Crop Mode",
+        "erase": "Erase Mode",
+        "text": "Text Mode",
+        "settings": "Settings"
+    },
+    "settings": {
+        "language": "Language Settings"
+    },
+    "buttons": {
+        "selectImage": "Select Image",
+        "addCrop": "Add Crop Area",
+        "clearCrop": "Clear Crop Areas",
+        "addEraser": "Add Erase Area",
+        "clearEraser": "Clear Erase Areas",
+        "addText": "Add Text Block",
+        "clearText": "Clear Text Blocks",
+        "cropAll": "Crop All and Download",
+        "downloadOriginal": "Download Original",
+        "downloadEdited": "Download Edited",
+        "cancel": "Cancel",
+        "save": "Save"
+    },
+    "labels": {
+        "aspectRatio": "Aspect Ratio",
+        "custom": "Custom",
+        "lockRatio": "Lock Ratio",
+        "backgroundColor": "Background Color",
+        "opacity": "Opacity",
+        "defaultFont": "Default Font",
+        "fontSize": "Font Size",
+        "textColor": "Text Color",
+        "fontFamily": "Font Family",
+        "fontWeight": "Font Weight",
+        "italic": "Italic",
+        "underline": "Underline",
+        "textPlaceholder": "Enter text..."
+    },
+    "fonts": {
+        "notoSansTC": "Noto Sans TC",
+        "arial": "Arial",
+        "timesNewRoman": "Times New Roman",
+        "courierNew": "Courier New"
+    },
+    "fontWeights": {
+        "normal": "Normal",
+        "bold": "Bold"
+    }
+}

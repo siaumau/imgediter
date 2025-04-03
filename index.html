@@ -513,35 +513,109 @@
                 bottom: -7px;
             }
         }
+
+        /* 設定頁面樣式 */
+        .settings-container {
+            padding: 20px;
+            background-color: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+        .settings-container h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            font-size: 1.5em;
+        }
+        .settings-container h2 i {
+            color: #3498db;
+        }
+        .language-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .language-options .lang-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background-color: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            color: #4a5568;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .language-options .lang-btn:hover {
+            background-color: #f8fafc;
+            transform: translateY(-1px);
+        }
+        .language-options .lang-btn.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        .language-options .lang-btn i {
+            font-size: 1.2em;
+        }
+        @media screen and (max-width: 768px) {
+            .settings-container {
+                padding: 15px;
+            }
+            .language-options {
+                flex-direction: column;
+            }
+            .language-options .lang-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1><i class="fas fa-image"></i> 多功能圖片編輯與裁切工具</h1>
+        <h1>
+            <i class="fas fa-image"></i>
+            <span data-i18n="title">多功能圖片編輯與裁切工具</span>
+        </h1>
 
         <div class="tabs">
             <div class="tab active" data-tab="crop">
-                <i class="fas fa-crop"></i> 裁切模式
+                <i class="fas fa-crop"></i>
+                <span data-i18n="tabs.crop">裁切模式</span>
             </div>
             <div class="tab" data-tab="erase">
-                <i class="fas fa-eraser"></i> 去背模式
+                <i class="fas fa-eraser"></i>
+                <span data-i18n="tabs.erase">去背模式</span>
             </div>
             <div class="tab" data-tab="text">
-                <i class="fas fa-font"></i> 文字模式
+                <i class="fas fa-font"></i>
+                <span data-i18n="tabs.text">文字模式</span>
+            </div>
+            <div class="tab" data-tab="settings">
+                <i class="fas fa-cog"></i>
+                <span data-i18n="tabs.settings">設定</span>
             </div>
         </div>
 
         <div class="tab-content active" id="crop-tab">
             <div class="toolbar">
                 <label class="file-label">
-                    <i class="fas fa-upload"></i> 選擇圖片
+                    <i class="fas fa-upload"></i>
+                    <span data-i18n="buttons.selectImage">選擇圖片</span>
                     <input type="file" id="file-input" accept="image/*">
                 </label>
 
                 <div class="control-group">
-                    <label for="aspect-ratio"><i class="fas fa-arrows-alt-h"></i> 長寬比例:</label>
+                    <label for="aspect-ratio">
+                        <i class="fas fa-arrows-alt-h"></i>
+                        <span data-i18n="labels.aspectRatio">長寬比例:</span>
+                    </label>
                     <select id="aspect-ratio">
-                        <option value="custom">自訂</option>
+                        <option value="custom" data-i18n="labels.custom">自訂</option>
                         <option value="1">1:1</option>
                         <option value="4/3">4:3</option>
                         <option value="16/9">16:9</option>
@@ -558,14 +632,19 @@
 
                 <div class="control-group">
                     <input type="checkbox" id="lock-ratio" checked>
-                    <label for="lock-ratio"><i class="fas fa-lock"></i> 鎖定比例</label>
+                    <label for="lock-ratio">
+                        <i class="fas fa-lock"></i>
+                        <span data-i18n="labels.lockRatio">鎖定比例</span>
+                    </label>
                 </div>
 
                 <button id="add-cropper" disabled>
-                    <i class="fas fa-plus"></i> 新增裁切框
+                    <i class="fas fa-plus"></i>
+                    <span data-i18n="buttons.addCrop">新增裁切框</span>
                 </button>
                 <button id="clear-croppers" disabled>
-                    <i class="fas fa-trash"></i> 清除裁切框
+                    <i class="fas fa-trash"></i>
+                    <span data-i18n="buttons.clearCrop">清除裁切框</span>
                 </button>
             </div>
         </div>
@@ -573,21 +652,29 @@
         <div class="tab-content" id="erase-tab">
             <div class="toolbar">
                 <div class="control-group">
-                    <label for="eraser-color"><i class="fas fa-palette"></i> 背景顏色:</label>
+                    <label for="eraser-color">
+                        <i class="fas fa-palette"></i>
+                        <span data-i18n="labels.backgroundColor">背景顏色:</span>
+                    </label>
                     <input type="color" id="eraser-color" value="#ffffff">
                 </div>
 
                 <div class="control-group">
-                    <label for="eraser-opacity"><i class="fas fa-sliders-h"></i> 透明度:</label>
+                    <label for="eraser-opacity">
+                        <i class="fas fa-sliders-h"></i>
+                        <span data-i18n="labels.opacity">透明度:</span>
+                    </label>
                     <input type="range" id="eraser-opacity" min="0" max="100" value="100">
                     <span id="opacity-value">100%</span>
                 </div>
 
                 <button id="add-eraser" disabled>
-                    <i class="fas fa-plus"></i> 新增去背區域
+                    <i class="fas fa-plus"></i>
+                    <span data-i18n="buttons.addEraser">新增去背區域</span>
                 </button>
                 <button id="clear-erasers" disabled>
-                    <i class="fas fa-trash"></i> 清除去背區域
+                    <i class="fas fa-trash"></i>
+                    <span data-i18n="buttons.clearEraser">清除去背區域</span>
                 </button>
             </div>
         </div>
@@ -595,43 +682,73 @@
         <div class="tab-content" id="text-tab">
             <div class="toolbar">
                 <div class="control-group">
-                    <label for="default-font"><i class="fas fa-font"></i> 預設字體:</label>
+                    <label for="default-font">
+                        <i class="fas fa-font"></i>
+                        <span data-i18n="labels.defaultFont">預設字體:</span>
+                    </label>
                     <select id="default-font">
-                        <option value="'Noto Sans TC', sans-serif">思源黑體</option>
-                        <option value="Arial, sans-serif">Arial</option>
-                        <option value="'Times New Roman', serif">Times New Roman</option>
-                        <option value="'Courier New', monospace">Courier New</option>
+                        <option value="'Noto Sans TC', sans-serif" data-i18n="fonts.notoSansTC">思源黑體</option>
+                        <option value="Arial, sans-serif" data-i18n="fonts.arial">Arial</option>
+                        <option value="'Times New Roman', serif" data-i18n="fonts.timesNewRoman">Times New Roman</option>
+                        <option value="'Courier New', monospace" data-i18n="fonts.courierNew">Courier New</option>
                     </select>
                 </div>
 
                 <div class="control-group">
-                    <label for="default-font-size"><i class="fas fa-text-height"></i> 字體大小:</label>
+                    <label for="default-font-size">
+                        <i class="fas fa-text-height"></i>
+                        <span data-i18n="labels.fontSize">字體大小:</span>
+                    </label>
                     <input type="number" id="default-font-size" value="24" min="8" max="120">
                 </div>
 
                 <div class="control-group">
-                    <label for="default-font-color"><i class="fas fa-palette"></i> 文字顏色:</label>
+                    <label for="default-font-color">
+                        <i class="fas fa-palette"></i>
+                        <span data-i18n="labels.textColor">文字顏色:</span>
+                    </label>
                     <input type="color" id="default-font-color" value="#000000">
                 </div>
 
                 <button id="add-text" disabled>
-                    <i class="fas fa-plus"></i> 新增文字區塊
+                    <i class="fas fa-plus"></i>
+                    <span data-i18n="buttons.addText">新增文字區塊</span>
                 </button>
                 <button id="clear-texts" disabled>
-                    <i class="fas fa-trash"></i> 清除文字區塊
+                    <i class="fas fa-trash"></i>
+                    <span data-i18n="buttons.clearText">清除文字區塊</span>
                 </button>
+            </div>
+        </div>
+
+        <div class="tab-content" id="settings-tab">
+            <div class="settings-container">
+                <h2><i class="fas fa-language"></i> <span data-i18n="settings.language">語言設定</span></h2>
+                <div class="language-options">
+                    <button class="lang-btn active" data-lang="zh-TW">
+                        <i class="fas fa-flag"></i>
+                        <span>中文</span>
+                    </button>
+                    <button class="lang-btn" data-lang="en">
+                        <i class="fas fa-flag"></i>
+                        <span>English</span>
+                    </button>
+                </div>
             </div>
         </div>
 
         <div class="download-buttons">
             <button id="crop-all" disabled>
-                <i class="fas fa-crop"></i> 裁切全部並下載
+                <i class="fas fa-crop"></i>
+                <span data-i18n="buttons.cropAll">裁切全部並下載</span>
             </button>
             <button id="download-original" disabled>
-                <i class="fas fa-download"></i> 下載原始圖片
+                <i class="fas fa-download"></i>
+                <span data-i18n="buttons.downloadOriginal">下載原始圖片</span>
             </button>
             <button id="download-edited" disabled>
-                <i class="fas fa-save"></i> 下載編輯後圖片
+                <i class="fas fa-save"></i>
+                <span data-i18n="buttons.downloadEdited">下載編輯後圖片</span>
             </button>
         </div>
 
@@ -648,10 +765,10 @@
     <div class="text-editor" id="text-editor">
         <div class="text-editor-controls">
             <select id="font-family">
-                <option value="'Noto Sans TC', sans-serif">思源黑體</option>
-                <option value="Arial, sans-serif">Arial</option>
-                <option value="'Times New Roman', serif">Times New Roman</option>
-                <option value="'Courier New', monospace">Courier New</option>
+                <option value="'Noto Sans TC', sans-serif" data-i18n="fonts.notoSansTC">思源黑體</option>
+                <option value="Arial, sans-serif" data-i18n="fonts.arial">Arial</option>
+                <option value="'Times New Roman', serif" data-i18n="fonts.timesNewRoman">Times New Roman</option>
+                <option value="'Courier New', monospace" data-i18n="fonts.courierNew">Courier New</option>
             </select>
 
             <input type="number" id="font-size" value="24" min="8" max="120">
@@ -659,25 +776,27 @@
             <input type="color" id="font-color" value="#000000">
 
             <select id="font-weight">
-                <option value="normal">一般</option>
-                <option value="bold">粗體</option>
+                <option value="normal" data-i18n="fontWeights.normal">一般</option>
+                <option value="bold" data-i18n="fontWeights.bold">粗體</option>
             </select>
 
             <input type="checkbox" id="font-italic">
-            <label for="font-italic">斜體</label>
+            <label for="font-italic" data-i18n="labels.italic">斜體</label>
 
             <input type="checkbox" id="font-underline">
-            <label for="font-underline">底線</label>
+            <label for="font-underline" data-i18n="labels.underline">底線</label>
         </div>
 
-        <textarea id="text-content" placeholder="輸入文字..."></textarea>
+        <textarea id="text-content" data-i18n-placeholder="labels.textPlaceholder" placeholder="輸入文字..."></textarea>
 
         <div class="text-editor-buttons">
             <button id="cancel-text">
-                <i class="fas fa-times"></i> 取消
+                <i class="fas fa-times"></i>
+                <span data-i18n="buttons.cancel">取消</span>
             </button>
             <button id="save-text">
-                <i class="fas fa-check"></i> 儲存
+                <i class="fas fa-check"></i>
+                <span data-i18n="buttons.save">儲存</span>
             </button>
         </div>
     </div>

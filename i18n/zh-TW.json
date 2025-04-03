@@ -1,1 +1,51 @@
- 
+{
+    "title": "多功能圖片編輯與裁切工具",
+    "tabs": {
+        "crop": "裁切模式",
+        "erase": "去背模式",
+        "text": "文字模式",
+        "settings": "設定"
+    },
+    "settings": {
+        "language": "語言設定"
+    },
+    "buttons": {
+        "selectImage": "選擇圖片",
+        "addCrop": "新增裁切框",
+        "clearCrop": "清除裁切框",
+        "addEraser": "新增去背區域",
+        "clearEraser": "清除去背區域",
+        "addText": "新增文字區塊",
+        "clearText": "清除文字區塊",
+        "cropAll": "裁切全部並下載",
+        "downloadOriginal": "下載原始圖片",
+        "downloadEdited": "下載編輯後圖片",
+        "cancel": "取消",
+        "save": "儲存"
+    },
+    "labels": {
+        "aspectRatio": "長寬比例",
+        "custom": "自訂",
+        "lockRatio": "鎖定比例",
+        "backgroundColor": "背景顏色",
+        "opacity": "透明度",
+        "defaultFont": "預設字體",
+        "fontSize": "字體大小",
+        "textColor": "文字顏色",
+        "fontFamily": "字體",
+        "fontWeight": "字重",
+        "italic": "斜體",
+        "underline": "底線",
+        "textPlaceholder": "輸入文字..."
+    },
+    "fonts": {
+        "notoSansTC": "思源黑體",
+        "arial": "Arial",
+        "timesNewRoman": "Times New Roman",
+        "courierNew": "Courier New"
+    },
+    "fontWeights": {
+        "normal": "一般",
+        "bold": "粗體"
+    }
+}
