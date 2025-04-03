@@ -148,7 +148,92 @@ let startX;
 let startY;
 let startDistance;
 let zoomControls;
-let rotationAngle = 0; // 新增：旋轉角度變數
+let rotationAngle = 0;
+let isZoomLocked = false;
+
+// 更新變換
+function updateTransform() {
+    if (!img || !imageWrapper) return;
+
+    // 計算容器和圖片的尺寸
+    const containerHeight = imageContainer.clientHeight - 40; // 減去內邊距
+    const imgRatio = img.naturalWidth / img.naturalHeight;
+
+    // 根據高度計算適當的寬度
+    const appropriateHeight = containerHeight;
+    const appropriateWidth = appropriateHeight * imgRatio;
+
+    // 設置圖片包裝器的尺寸
+    imageWrapper.style.height = `${appropriateHeight}px`;
+    imageWrapper.style.width = `${appropriateWidth}px`;
+
+    // 應用變換
+    imageWrapper.style.transform = `translate(${currentX}px, ${currentY}px) rotate(${rotationAngle}deg) scale(${scale})`;
+}
+
+// 重置圖片容器
+function resetImageContainer() {
+    if (!imageWrapper) return;
+
+    // 移除之前的樣式設置
+    imageWrapper.style.width = '';
+    imageWrapper.style.height = '';
+
+    // 重置縮放和位置
+    scale = 1;
+    currentX = 0;
+    currentY = 0;
+    rotationAngle = 0;
+
+    // 更新變換
+    updateTransform();
+
+    // 更新縮放控制項
+    const zoomLevel = document.querySelector('.zoom-level');
+    if (zoomLevel) {
+        zoomLevel.textContent = '100%';
+    }
+}
+
+// 設置縮放
+function setZoom(newScale) {
+    if (!img) return;
+
+    scale = newScale;
+    updateTransform();
+
+    const zoomLevel = document.querySelector('.zoom-level');
+    if (zoomLevel) {
+        zoomLevel.textContent = `${Math.round(scale * 100)}%`;
+    }
+
+    // 更新按鈕狀態
+    const zoomInBtn = document.getElementById('zoom-in');
+    const zoomOutBtn = document.getElementById('zoom-out');
+    const zoomResetBtn = document.getElementById('zoom-reset');
+    const rotateBtn = document.getElementById('rotate-btn');
+    const zoomLockBtn = document.getElementById('zoom-lock');
+
+    if (zoomInBtn) zoomInBtn.disabled = scale >= 5;
+    if (zoomOutBtn) zoomOutBtn.disabled = scale <= 0.1;
+    if (zoomResetBtn) zoomResetBtn.disabled = scale === 1 && currentX === 0 && currentY === 0 && rotationAngle === 0;
+    if (rotateBtn) rotateBtn.disabled = false;
+    if (zoomLockBtn) zoomLockBtn.disabled = false;
+}
+
+// 重置變換
+function resetTransform() {
+    scale = 1;
+    currentX = 0;
+    currentY = 0;
+    rotationAngle = 0;
+    updateTransform();
+
+    const zoomLevel = document.querySelector('.zoom-level');
+    if (zoomLevel) {
+        zoomLevel.textContent = '100%';
+    }
+}
 
 // 初始化
 document.addEventListener('DOMContentLoaded', function() {
@@ -253,6 +338,15 @@ document.addEventListener('DOMContentLoaded', function() {
         updateTransform();
     });
 
+    // 縮放鎖定按鈕事件
+    const zoomLockBtn = document.getElementById('zoom-lock');
+    zoomLockBtn.addEventListener('click', () => {
+        isZoomLocked = !isZoomLocked;
+        zoomLockBtn.classList.toggle('locked');
+        const icon = zoomLockBtn.querySelector('i');
+        icon.className = isZoomLocked ? 'fas fa-lock' : 'fas fa-unlock';
+    });
+
     // 觸控事件處理
     imageWrapper.addEventListener('pointerdown', handlePointerDown);
     imageWrapper.addEventListener('pointermove', handlePointerMove);
@@ -309,6 +403,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function handleWheel(e) {
+        if (isZoomLocked) return; // 如果縮放已鎖定，則不處理滾輪事件
         e.preventDefault();
         const delta = e.deltaY * -0.01;
         const newScale = Math.min(Math.max(0.1, scale * (1 + delta)), 5);
@@ -322,6 +417,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function handleGestureChange(e) {
         e.preventDefault();
+        if (isZoomLocked) return; // 如果縮放已鎖定，則不處理手勢事件
         if (startDistance === null) {
             startDistance = e.scale;
             return;
@@ -335,50 +431,13 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
     }
 
-    function setZoom(newScale) {
-        scale = newScale;
-        updateTransform();
-        zoomLevel.textContent = `${Math.round(scale * 100)}%`;
-
-        // 更新按鈕狀態
-        zoomInBtn.disabled = scale >= 5;
-        zoomOutBtn.disabled = scale <= 0.1;
-        zoomResetBtn.disabled = scale === 1 && currentX === 0 && currentY === 0 && rotationAngle === 0;
-        rotateBtn.disabled = false; // 啟用旋轉按鈕
-    }
-
-    function updateTransform() {
-        // 計算容器和圖片的尺寸
-        const containerHeight = imageContainer.clientHeight - 40; // 減去內邊距
-        const imgRatio = img.naturalWidth / img.naturalHeight;
-
-        // 根據高度計算適當的寬度
-        const appropriateHeight = containerHeight;
-        const appropriateWidth = appropriateHeight * imgRatio;
-
-        // 設置圖片包裝器的尺寸
-        imageWrapper.style.height = `${appropriateHeight}px`;
-        imageWrapper.style.width = `${appropriateWidth}px`;
-
-        // 應用變換
-        imageWrapper.style.transform = `translate(${currentX}px, ${currentY}px) rotate(${rotationAngle}deg) scale(${scale})`;
-    }
-
-    function resetTransform() {
-        scale = 1;
-        currentX = 0;
-        currentY = 0;
-        rotationAngle = 0;
-        updateTransform();
-        zoomLevel.textContent = '100%';
-    }
-
     // 當圖片載入時啟用控制項
     img.addEventListener('load', () => {
         zoomInBtn.disabled = false;
         zoomOutBtn.disabled = false;
         zoomResetBtn.disabled = true;
         rotateBtn.disabled = false;
+        zoomLockBtn.disabled = false;
     });
 });
 
@@ -469,28 +528,6 @@ function handleFileChange(e) {
         };
     };
     reader.readAsDataURL(file);
-}
-
-// 重置圖片容器
-function resetImageContainer() {
-    // 移除之前的樣式設置
-    imageWrapper.style.width = '';
-    imageWrapper.style.height = '';
-
-    // 重置縮放和位置
-    scale = 1;
-    currentX = 0;
-    currentY = 0;
-    rotationAngle = 0;
-
-    // 更新變換
-    updateTransform();
-
-    // 更新縮放控制項
-    const zoomLevel = document.querySelector('.zoom-level');
-    if (zoomLevel) {
-        zoomLevel.textContent = '100%';
-    }
 }
 
 // 更新長寬比例
@@ -952,17 +989,93 @@ function closeTextEditor() {
     currentTextBoxIndex = null;
 }
 
-// 開始拖曳元素
+// 開始拖曳
 function startDrag(e, type) {
+    e.stopPropagation();
     isDragging = true;
     dragType = type;
-    dragIndex = parseInt(e.currentTarget.dataset.index, 10);
-    dragStartX = e.clientX;
-    dragStartY = e.clientY;
+    dragIndex = parseInt(e.target.dataset.index, 10);
 
-    // 停止事件冒泡，防止觸發圖片的移動
-    e.stopPropagation();
+    const element = type === 'cropper' ? croppers[dragIndex] :
+                   type === 'eraser' ? erasers[dragIndex] :
+                   textBoxes[dragIndex];
+
+    // 記錄起始位置
+    dragStartX = e.clientX - element.x;
+    dragStartY = e.clientY - element.y;
+}
+
+// 拖曳元素
+function dragElement(e) {
     e.preventDefault();
+    if (!isDragging) return;
+
+    let element, domElement;
+
+    if (dragType === 'cropper') {
+        element = croppers[dragIndex];
+        domElement = document.querySelector(`.cropper[data-index="${dragIndex}"]`);
+    } else if (dragType === 'eraser') {
+        element = erasers[dragIndex];
+        domElement = document.querySelector(`.eraser[data-index="${dragIndex}"]`);
+    } else if (dragType === 'text') {
+        element = textBoxes[dragIndex];
+        domElement = document.querySelector(`.text-box[data-index="${dragIndex}"]`);
+    }
+
+    if (!element || !domElement) return;
+
+    // 計算新位置，使用相對於起始點的位移
+    let newX = e.clientX - dragStartX;
+    let newY = e.clientY - dragStartY;
+
+    // 確保不會超出圖片範圍
+    newX = Math.max(0, Math.min(newX, img.naturalWidth - element.width));
+    newY = Math.max(0, Math.min(newY, img.naturalHeight - element.height));
+
+    // 確保座標是偶數
+    newX = ensureEven(newX);
+    newY = ensureEven(newY);
+
+    // 更新元素位置
+    element.x = newX;
+    element.y = newY;
+
+    // 更新 DOM 元素位置
+    domElement.style.left = newX + 'px';
+    domElement.style.top = newY + 'px';
+
+    // 如果是去背區域，則更新編輯 Canvas
+    if (dragType === 'eraser') {
+        requestAnimationFrame(() => {
+            // 清除原有圖像
+            editCtx.drawImage(img, 0, 0);
+            // 重新應用所有去背效果
+            erasers.forEach(e => applyEraserToCanvas(e));
+        });
+    }
+
+    // 如果是文字框，則更新 Canvas 中的文字
+    if (dragType === 'text') {
+        requestAnimationFrame(() => {
+            // 清除原有圖像
+            editCtx.drawImage(img, 0, 0);
+            // 重新應用所有去背效果
+            erasers.forEach(e => applyEraserToCanvas(e));
+            // 重新繪製所有文字
+            redrawAllTextBoxes();
+        });
+    }
+}
+
+// 鼠標釋放處理
+function onMouseUp(e) {
+    if (isDragging || isResizing) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    isDragging = false;
+    isResizing = false;
 }
 
 // 開始調整大小
@@ -999,83 +1112,6 @@ function onMouseMove(e) {
     } else if (isResizing) {
         resizeElement(e);
     }
-}
-
-// 鼠標釋放處理
-function onMouseUp() {
-    isDragging = false;
-    isResizing = false;
-}
-
-// 拖曳元素
-function dragElement(e) {
-    const deltaX = e.clientX - dragStartX;
-    const deltaY = e.clientY - dragStartY;
-
-    let element, domElement;
-
-    if (dragType === 'cropper') {
-        element = croppers[dragIndex];
-        domElement = document.querySelector(`.cropper[data-index="${dragIndex}"]`);
-    } else if (dragType === 'eraser') {
-        element = erasers[dragIndex];
-        domElement = document.querySelector(`.eraser[data-index="${dragIndex}"]`);
-    } else if (dragType === 'text') {
-        element = textBoxes[dragIndex];
-        domElement = document.querySelector(`.text-box[data-index="${dragIndex}"]`);
-    }
-
-    if (!element || !domElement) return;
-
-    // 計算新位置，確保在圖片範圍內
-    let newX = Math.max(0, element.x + deltaX);
-    let newY = Math.max(0, element.y + deltaY);
-
-    // 確保不會超出圖片範圍
-    if (newX + element.width > img.naturalWidth) {
-        newX = img.naturalWidth - element.width;
-    }
-
-    if (newY + element.height > img.naturalHeight) {
-        newY = img.naturalHeight - element.height;
-    }
-
-    // 確保座標是偶數
-    newX = ensureEven(newX);
-    newY = ensureEven(newY);
-
-    // 更新元素位置
-    element.x = newX;
-    element.y = newY;
-
-    // 更新 DOM 元素位置
-    domElement.style.left = newX + 'px';
-    domElement.style.top = newY + 'px';
-
-    // 如果是去背區域，則更新編輯 Canvas
-    if (dragType === 'eraser') {
-        // 清除原有圖像
-        editCtx.drawImage(img, 0, 0);
-
-        // 重新應用所有去背效果
-        erasers.forEach(e => applyEraserToCanvas(e));
-    }
-
-    // 如果是文字框，則更新 Canvas 中的文字
-    if (dragType === 'text') {
-        // 清除原有圖像
-        editCtx.drawImage(img, 0, 0);
-
-        // 重新應用所有去背效果
-        erasers.forEach(e => applyEraserToCanvas(e));
-
-        // 重新繪製所有文字
-        redrawAllTextBoxes();
-    }
-
-    // 更新拖曳起始點
-    dragStartX = e.clientX;
-    dragStartY = e.clientY;
 }
 
 // 調整元素大小
@@ -1224,28 +1260,55 @@ function cropAllAndDownload() {
     const tempCanvas = document.createElement('canvas');
     const ctx = tempCanvas.getContext('2d');
 
+    // 計算實際的縮放比例
+    const containerHeight = imageContainer.clientHeight - 40;
+    const imgRatio = img.naturalWidth / img.naturalHeight;
+    const appropriateHeight = containerHeight;
+    const appropriateWidth = appropriateHeight * imgRatio;
+
+    // 計算縮放因子
+    const scaleFactorX = img.naturalWidth / appropriateWidth;
+    const scaleFactorY = img.naturalHeight / appropriateHeight;
+
     // 處理每個裁切區域
     croppers.forEach((cropper, index) => {
+        // 計算實際的裁切區域（考慮縮放和旋轉）
+        const actualX = Math.round(cropper.x * scaleFactorX / scale);
+        const actualY = Math.round(cropper.y * scaleFactorY / scale);
+        const actualWidth = Math.round(cropper.width * scaleFactorX / scale);
+        const actualHeight = Math.round(cropper.height * scaleFactorY / scale);
+
         // 設置 canvas 大小為裁切區域大小
-        tempCanvas.width = cropper.width;
-        tempCanvas.height = cropper.height;
+        tempCanvas.width = actualWidth;
+        tempCanvas.height = actualHeight;
+
+        // 如果有旋轉，需要調整 canvas 上下文
+        ctx.save();
+        if (rotationAngle !== 0) {
+            // 設置旋轉中心點
+            ctx.translate(tempCanvas.width / 2, tempCanvas.height / 2);
+            ctx.rotate((rotationAngle * Math.PI) / 180);
+            ctx.translate(-tempCanvas.width / 2, -tempCanvas.height / 2);
+        }
 
         // 繪製裁切區域到 canvas
-        if (editCanvas && croppers.length > 0) {
+        if (editCanvas && editCtx) {
             // 從編輯後的圖像裁切
             ctx.drawImage(
                 editCanvas,
-                cropper.x, cropper.y, cropper.width, cropper.height,
-                0, 0, cropper.width, cropper.height
+                actualX, actualY, actualWidth, actualHeight,
+                0, 0, actualWidth, actualHeight
             );
         } else {
             // 從原始圖像裁切
             ctx.drawImage(
                 img,
-                cropper.x, cropper.y, cropper.width, cropper.height,
-                0, 0, cropper.width, cropper.height
+                actualX, actualY, actualWidth, actualHeight,
+                0, 0, actualWidth, actualHeight
             );
         }
+
+        ctx.restore();
 
         // 轉換 canvas 為圖片數據
         const imageData = tempCanvas.toDataURL('image/png');

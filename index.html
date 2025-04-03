@@ -428,6 +428,12 @@
             font-weight: bold;
             color: #2c3e50;
         }
+        .zoom-controls button.locked {
+            background-color: #e74c3c;
+        }
+        .zoom-controls button.locked i {
+            color: white;
+        }
 
         /* 響應式設計 */
         @media screen and (max-width: 768px) {
@@ -915,6 +921,9 @@
                 </button>
                 <button id="rotate-btn" disabled>
                     <i class="fas fa-sync-alt"></i>
+                </button>
+                <button id="zoom-lock" disabled>
+                    <i class="fas fa-unlock"></i>
                 </button>
             </div>
         </div>
