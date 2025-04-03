@@ -330,6 +330,189 @@
             border-radius: 12px;
             border: 1px solid #e2e8f0;
         }
+
+        /* 響應式設計 */
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 15px;
+                border-radius: 12px;
+            }
+            h1 {
+                font-size: 1.8em;
+                margin-bottom: 20px;
+            }
+            h1 i {
+                font-size: 1.5em;
+            }
+            .toolbar {
+                padding: 10px;
+                gap: 10px;
+            }
+            .control-group {
+                padding: 6px 8px;
+                gap: 8px;
+            }
+            button {
+                padding: 8px 16px;
+                font-size: 0.9em;
+            }
+            input[type="number"], input[type="text"], select {
+                width: 70px;
+                padding: 6px;
+                font-size: 0.9em;
+            }
+            input[type="text"] {
+                width: 150px;
+            }
+            .image-container {
+                margin-top: 20px;
+                padding: 10px;
+            }
+            .text-editor {
+                width: 90%;
+                padding: 15px;
+            }
+            .text-editor-controls {
+                padding: 10px;
+                gap: 10px;
+            }
+            .text-editor textarea {
+                min-height: 100px;
+                margin: 10px 0;
+            }
+            .download-buttons {
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px;
+            }
+            .download-buttons button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 1.5em;
+            }
+            .tabs {
+                flex-direction: column;
+                gap: 5px;
+            }
+            .tab {
+                width: 100%;
+                justify-content: center;
+                margin-right: 0;
+                border-radius: 8px;
+                border: 1px solid #e2e8f0;
+            }
+            .tab.active {
+                border-bottom: 1px solid #e2e8f0;
+                margin-bottom: 0;
+            }
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .control-group {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .control-group label {
+                flex: 1;
+            }
+            input[type="number"], input[type="text"], select {
+                flex: 2;
+            }
+            button {
+                width: 100%;
+                justify-content: center;
+            }
+            .text-editor {
+                width: 95%;
+                padding: 10px;
+            }
+            .text-editor-controls {
+                flex-direction: column;
+            }
+            .text-editor-controls select,
+            .text-editor-controls input {
+                width: 100%;
+                min-width: 100%;
+            }
+            .text-editor-buttons {
+                flex-direction: column;
+            }
+            .text-editor-buttons button {
+                width: 100%;
+            }
+            .resizer {
+                width: 10px;
+                height: 10px;
+            }
+            .resizer-nw, .resizer-ne, .resizer-sw, .resizer-se {
+                top: -5px;
+                left: -5px;
+                right: -5px;
+                bottom: -5px;
+            }
+            .cropper-index, .eraser-index, .text-index {
+                font-size: 10px;
+                padding: 1px 6px;
+            }
+        }
+
+        /* 橫向手機模式優化 */
+        @media screen and (max-height: 480px) and (orientation: landscape) {
+            .container {
+                padding: 10px;
+            }
+            .image-container {
+                max-height: 300px;
+            }
+            .text-editor {
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+            .text-editor textarea {
+                min-height: 80px;
+            }
+            .toolbar {
+                margin-bottom: 10px;
+            }
+            .download-buttons {
+                margin-top: 10px;
+            }
+        }
+
+        /* 觸控裝置優化 */
+        @media (hover: none) {
+            button:hover {
+                transform: none;
+            }
+            .file-label:hover {
+                transform: none;
+            }
+            .tab:hover {
+                background-color: #f8fafc;
+            }
+            .resizer {
+                width: 15px;
+                height: 15px;
+            }
+            .resizer-nw, .resizer-ne, .resizer-sw, .resizer-se {
+                top: -7px;
+                left: -7px;
+                right: -7px;
+                bottom: -7px;
+            }
+        }
     </style>
 </head>
 <body>
