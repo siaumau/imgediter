@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多功能圖片編輯與裁切工具</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="script.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Noto Sans TC', Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .toolbar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        button.mode-btn {
+            background-color: #2196F3;
+        }
+        button.mode-btn.active {
+            background-color: #0b7dda;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+        button.remove-btn {
+            background-color: #f44336;
+        }
+        button.remove-btn:hover {
+            background-color: #d32f2f;
+        }
+        button.text-btn {
+            background-color: #9C27B0;
+        }
+        button.text-btn:hover {
+            background-color: #7B1FA2;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .file-label {
+            padding: 8px 16px;
+            border-radius: 4px;
+            background-color: #2196F3;
+            color: white;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .file-label:hover {
+            background-color: #0b7dda;
+        }
+        input[type="number"], input[type="text"], select {
+            width: 70px;
+            padding: 6px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        input[type="text"] {
+            width: 150px;
+        }
+        select {
+            width: auto;
+        }
+        .color-picker {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .image-container {
+            position: relative;
+            margin-top: 20px;
+            overflow: auto;
+            border: 1px solid #ddd;
+            max-height: 600px;
+            background-color: #eee;
+        }
+        .image-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .cropper {
+            position: absolute;
+            border: 2px dashed #ff5722;
+            background-color: rgba(255, 87, 34, 0.2);
+            cursor: move;
+            box-sizing: border-box;
+        }
+        .eraser {
+            position: absolute;
+            border: 2px dashed #f44336;
+            background-color: rgba(244, 67, 54, 0.2);
+            cursor: crosshair;
+            box-sizing: border-box;
+        }
+        .text-box {
+            position: absolute;
+            border: 1px solid #9C27B0;
+            background-color: transparent;
+            cursor: move;
+            padding: 5px;
+        }
+        .resizer {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: white;
+            border: 1px solid #ff5722;
+        }
+        .resizer-nw {
+            top: -5px;
+            left: -5px;
+            cursor: nwse-resize;
+        }
+        .resizer-ne {
+            top: -5px;
+            right: -5px;
+            cursor: nesw-resize;
+        }
+        .resizer-sw {
+            bottom: -5px;
+            left: -5px;
+            cursor: nesw-resize;
+        }
+        .resizer-se {
+            bottom: -5px;
+            right: -5px;
+            cursor: nwse-resize;
+        }
+        .cropper-index, .eraser-index, .text-index {
+            position: absolute;
+            top: 0;
+            left: 0;
+            color: white;
+            padding: 1px 5px;
+            font-size: 12px;
+        }
+        .cropper-index {
+            background-color: #ff5722;
+        }
+        .eraser-index {
+            background-color: #f44336;
+        }
+        .text-index {
+            background-color: #9C27B0;
+        }
+        .text-editor {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: none;
+            width: 400px;
+        }
+        .text-editor textarea {
+            width: 100%;
+            min-height: 100px;
+            margin-bottom: 10px;
+            padding: 8px;
+            font-family: inherit;
+        }
+        .text-editor-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .text-editor-controls select, .text-editor-controls input {
+            width: auto;
+        }
+        .text-editor-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            margin-right: 5px;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+        }
+        .tab.active {
+            background-color: white;
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>多功能圖片編輯與裁切工具</h1>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="crop">裁切模式</div>
+            <div class="tab" data-tab="erase">去背模式</div>
+            <div class="tab" data-tab="text">文字模式</div>
+        </div>
+
+        <div class="tab-content active" id="crop-tab">
+            <div class="toolbar">
+                <label class="file-label">
+                    選擇圖片
+                    <input type="file" id="file-input" accept="image/*">
+                </label>
+
+                <div class="control-group">
+                    <label for="aspect-ratio">長寬比例:</label>
+                    <select id="aspect-ratio">
+                        <option value="custom">自訂</option>
+                        <option value="1">1:1</option>
+                        <option value="4/3">4:3</option>
+                        <option value="16/9">16:9</option>
+                        <option value="3/4">3:4</option>
+                        <option value="9/16">9:16</option>
+                    </select>
+                </div>
+
+                <div class="control-group" id="custom-ratio-group" style="display: none;">
+                    <input type="number" id="ratio-width" value="100" min="2" step="2">
+                    <span>:</span>
+                    <input type="number" id="ratio-height" value="100" min="2" step="2">
+                </div>
+
+                <div class="control-group">
+                    <input type="checkbox" id="lock-ratio" checked>
+                    <label for="lock-ratio">鎖定比例</label>
+                </div>
+
+                <button id="add-cropper" disabled>+ 新增裁切框</button>
+                <button id="clear-croppers" disabled>清除裁切框</button>
+            </div>
+        </div>
+
+        <div class="tab-content" id="erase-tab">
+            <div class="toolbar">
+                <div class="control-group">
+                    <label for="eraser-color">背景顏色:</label>
+                    <input type="color" id="eraser-color" value="#ffffff">
+                </div>
+
+                <div class="control-group">
+                    <label for="eraser-opacity">透明度:</label>
+                    <input type="range" id="eraser-opacity" min="0" max="100" value="100" style="width: 100px;">
+                    <span id="opacity-value">100%</span>
+                </div>
+
+                <button id="add-eraser" disabled>+ 新增去背區域</button>
+                <button id="clear-erasers" disabled>清除去背區域</button>
+            </div>
+        </div>
+
+        <div class="tab-content" id="text-tab">
+            <div class="toolbar">
+                <div class="control-group">
+                    <label for="default-font">預設字體:</label>
+                    <select id="default-font">
+                        <option value="'Noto Sans TC', sans-serif">思源黑體</option>
+                        <option value="Arial, sans-serif">Arial</option>
+                        <option value="'Times New Roman', serif">Times New Roman</option>
+                        <option value="'Courier New', monospace">Courier New</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="default-font-size">字體大小:</label>
+                    <input type="number" id="default-font-size" value="24" min="8" max="120">
+                </div>
+
+                <div class="control-group">
+                    <label for="default-font-color">文字顏色:</label>
+                    <input type="color" id="default-font-color" value="#000000">
+                </div>
+
+                <button id="add-text" disabled>+ 新增文字區塊</button>
+                <button id="clear-texts" disabled>清除文字區塊</button>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <button id="crop-all" disabled>裁切全部並下載</button>
+            <button id="download-original" disabled>下載原始圖片</button>
+            <button id="download-edited" disabled>下載編輯後圖片</button>
+        </div>
+
+        <div class="image-container" id="image-container">
+            <div class="image-wrapper" id="image-wrapper">
+                <img id="source-image" style="display: none;">
+                <canvas id="edit-canvas" style="display: none;"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-overlay"></div>
+
+    <div class="text-editor" id="text-editor">
+        <div class="text-editor-controls">
+            <select id="font-family">
+                <option value="'Noto Sans TC', sans-serif">思源黑體</option>
+                <option value="Arial, sans-serif">Arial</option>
+                <option value="'Times New Roman', serif">Times New Roman</option>
+                <option value="'Courier New', monospace">Courier New</option>
+            </select>
+
+            <input type="number" id="font-size" value="24" min="8" max="120">
+
+            <input type="color" id="font-color" value="#000000">
+
+            <select id="font-weight">
+                <option value="normal">一般</option>
+                <option value="bold">粗體</option>
+            </select>
+
+            <input type="checkbox" id="font-italic">
+            <label for="font-italic">斜體</label>
+
+            <input type="checkbox" id="font-underline">
+            <label for="font-underline">底線</label>
+        </div>
+
+        <textarea id="text-content" placeholder="輸入文字..."></textarea>
+
+        <div class="text-editor-buttons">
+            <button id="cancel-text">取消</button>
+            <button id="save-text">儲存</button>
+        </div>
+    </div>
+</body>
+</html>
