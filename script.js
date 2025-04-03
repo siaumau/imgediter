@@ -206,6 +206,9 @@ function handleFileChange(e) {
 
             // 初始化編輯 Canvas
             initEditCanvas();
+
+            // 將 edit-canvas 設置為隱藏
+            editCanvas.style.display = 'none';
         };
         img.src = event.target.result;
         sourceImage = {
