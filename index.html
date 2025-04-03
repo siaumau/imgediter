@@ -402,19 +402,41 @@
                 font-size: 1.5em;
             }
             .tabs {
-                flex-direction: column;
-                gap: 5px;
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 8px;
+                border-bottom: none;
+                margin-bottom: 15px;
             }
             .tab {
-                width: 100%;
+                width: calc(50% - 4px);
                 justify-content: center;
                 margin-right: 0;
                 border-radius: 8px;
                 border: 1px solid #e2e8f0;
+                padding: 8px 12px;
+                font-size: 0.9em;
+                transition: all 0.3s ease;
+                background-color: white;
+                color: #4a5568;
+            }
+            .tab i {
+                color: #4a5568;
+                transition: all 0.3s ease;
+            }
+            .tab:hover {
+                background-color: #edf2f7;
             }
             .tab.active {
-                border-bottom: 1px solid #e2e8f0;
+                border: none;
                 margin-bottom: 0;
+                background-color: #3498db !important;
+                color: white !important;
+                font-weight: bold;
+            }
+            .tab.active i {
+                color: white !important;
             }
             .toolbar {
                 flex-direction: column;

@@ -1,20 +1,22 @@
 // 語言設定
-let currentLang = 'zh-TW';
+let currentLang = localStorage.getItem('preferredLanguage') || 'zh-TW';
 let translations = {};
 
 // 載入語言檔案
 async function loadTranslations(lang) {
     try {
         const response = await fetch(`i18n/${lang}.json`);
-        translations = await response.json();
-        updateUI();
+        const translations = await response.json();
+        localStorage.setItem('preferredLanguage', lang);
+        return translations;
     } catch (error) {
         console.error('Error loading translations:', error);
+        return null;
     }
 }
 
 // 更新 UI 文字
-function updateUI() {
+function updateUI(translations) {
     // 更新所有帶有 data-i18n 屬性的元素
     document.querySelectorAll('[data-i18n]').forEach(element => {
         const key = element.getAttribute('data-i18n');
@@ -49,9 +51,20 @@ function updateUI() {
 }
 
 // 初始化語言設定
-document.addEventListener('DOMContentLoaded', () => {
-    // 載入預設語言
-    loadTranslations(currentLang);
+document.addEventListener('DOMContentLoaded', async () => {
+    // 載入儲存的語言設定
+    const savedLang = localStorage.getItem('preferredLanguage');
+    if (savedLang) {
+        currentLang = savedLang;
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.lang === currentLang);
+        });
+    }
+
+    const translations = await loadTranslations(currentLang);
+    if (translations) {
+        updateUI(translations);
+    }
 
     // 設定語言切換按鈕事件
     document.querySelectorAll('.lang-btn').forEach(btn => {

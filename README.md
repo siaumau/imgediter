@@ -25,6 +25,12 @@ A powerful web-based image editing tool that allows you to crop, erase backgroun
   - Font size and color customization
   - Text style options (bold, italic, underline)
 
+- **Multi-language Support**
+  - Switch between English and Traditional Chinese
+  - Instant language switching
+  - Automatic language preference saving
+  - Language settings persist across sessions
+
 ### Usage
 
 1. Click "Choose Image" to upload your image
@@ -32,10 +38,17 @@ A powerful web-based image editing tool that allows you to crop, erase backgroun
 3. Use the tools to edit your image
 4. Download the result
 
+### Language Settings
+1. Click on the "Settings" tab
+2. Select your preferred language from the language options
+3. The interface will update immediately to your chosen language
+4. Your language preference will be automatically saved and restored next time you visit
+
 ### Technical Requirements
 
 - Modern web browser with JavaScript enabled
 - Internet connection (for loading external libraries)
+- Web browser with localStorage support
 - Web server to run the application
 
 ### Dependencies
@@ -51,6 +64,9 @@ imgediter/
 ├── index.html      # Main HTML file
 ├── styles.css      # CSS styles
 ├── script.js       # JavaScript functionality
+├── i18n/           # Language files
+│   ├── en.json    # English translations
+│   └── zh-TW.json # Traditional Chinese translations
 └── README.md       # This file
 ```
 
@@ -79,6 +95,12 @@ imgediter/
   - 字體大小和顏色自訂
   - 文字樣式選項（粗體、斜體、底線）
 
+- **多語系支援**
+  - 可切換繁體中文和英文介面
+  - 即時語言切換
+  - 自動儲存語言偏好設定
+  - 語言設定會在下次造訪時自動套用
+
 ### 使用方法
 
 1. 點擊「選擇圖片」上傳您的圖片
@@ -86,10 +108,17 @@ imgediter/
 3. 使用工具編輯圖片
 4. 下載結果
 
+### 語言設定
+1. 點擊「設定」標籤
+2. 從語言選項中選擇偏好的語言
+3. 介面會立即更新為選擇的語言
+4. 您的語言偏好設定會自動儲存，下次造訪時會自動套用
+
 ### 技術需求
 
 - 支援 JavaScript 的現代網頁瀏覽器
 - 網路連線（用於載入外部函式庫）
+- 支援 localStorage 的網頁瀏覽器
 - 網頁伺服器來運行應用程式
 
 ### 相依套件
@@ -105,5 +134,8 @@ imgediter/
 ├── index.html      # 主要 HTML 檔案
 ├── styles.css      # CSS 樣式
 ├── script.js       # JavaScript 功能
+├── i18n/           # 語系檔案
+│   ├── en.json    # 英文翻譯
+│   └── zh-TW.json # 繁體中文翻譯
 └── README.md       # 本文件
 ```
