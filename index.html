@@ -129,47 +129,80 @@
         .image-container {
             position: relative;
             margin-top: 30px;
-            overflow: auto;
+            overflow: hidden;
             border: 2px dashed #e2e8f0;
             border-radius: 12px;
-            max-height: 600px;
+            height: calc(100vh - 300px);
+            min-height: 400px;
             background-color: #f8fafc;
             padding: 20px;
             touch-action: none;
-            min-height: 300px;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.3s ease;
         }
+
+        .image-container.drag-over {
+            border-color: #3498db;
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
         .upload-hint {
             text-align: center;
             color: #94a3b8;
             display: none;
+            cursor: pointer;
+            padding: 40px;
+            width: 100%;
+            height: 100%;
+            transition: all 0.3s ease;
         }
+
+        .upload-hint.show {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
         .upload-hint i {
             font-size: 4em;
             margin-bottom: 15px;
             color: #cbd5e1;
+            transition: all 0.3s ease;
         }
+
+        .upload-hint:hover i,
+        .image-container.drag-over .upload-hint i {
+            color: #3498db;
+            transform: scale(1.1);
+        }
+
         .upload-hint p {
             font-size: 1.2em;
             margin: 10px 0;
+            transition: all 0.3s ease;
         }
-        .upload-hint.show {
-            display: block;
+
+        .image-container.drag-over .upload-hint p {
+            color: #3498db;
         }
         .image-wrapper {
             position: relative;
             display: none;
-            width: 100%;
+            height: 100%;
+            max-width: 100%;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             transform-origin: center center;
             will-change: transform;
         }
         #source-image, #edit-canvas {
-            max-width: 100%;
-            height: auto;
+            height: 100%;
+            width: auto;
+            max-width: none;
             display: block;
+            object-fit: contain;
         }
         .cropper {
             position: absolute;
@@ -433,7 +466,8 @@
                 width: 150px;
             }
             .image-container {
-                margin-top: 20px;
+                height: calc(100vh - 250px);
+                min-height: 300px;
                 padding: 10px;
             }
             .text-editor {
@@ -567,6 +601,10 @@
             .upload-hint p {
                 font-size: 1em;
             }
+            .image-container {
+                height: calc(100vh - 200px);
+                min-height: 250px;
+            }
         }
 
         /* 橫向手機模式優化 */
@@ -575,7 +613,8 @@
                 padding: 10px;
             }
             .image-container {
-                max-height: 300px;
+                height: calc(100vh - 150px);
+                min-height: 200px;
             }
             .text-editor {
                 max-height: 90vh;

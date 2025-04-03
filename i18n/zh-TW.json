@@ -6,7 +6,7 @@
     },
     "tabs": {
         "crop": "裁切模式",
-        "erase": "去背模式",
+        "erase": "塗抹模式",
         "text": "文字模式",
         "settings": "設定"
     },
@@ -17,8 +17,8 @@
         "selectImage": "選擇圖片",
         "addCrop": "新增裁切框",
         "clearCrop": "清除裁切框",
-        "addEraser": "新增去背區域",
-        "clearEraser": "清除去背區域",
+        "addEraser": "新增塗抹區域",
+        "clearEraser": "清除塗抹區域",
         "addText": "新增文字區塊",
         "clearText": "清除文字區塊",
         "cropAll": "裁切全部並下載",

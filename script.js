@@ -265,6 +265,18 @@ document.addEventListener('DOMContentLoaded', function() {
     imageWrapper.addEventListener('gesturechange', handleGestureChange);
     imageWrapper.addEventListener('gestureend', handleGestureEnd);
 
+    // 添加拖放事件監聽器
+    imageContainer.addEventListener('dragenter', handleDragEnter);
+    imageContainer.addEventListener('dragover', handleDragOver);
+    imageContainer.addEventListener('dragleave', handleDragLeave);
+    imageContainer.addEventListener('drop', handleDrop);
+
+    // 點擊上傳提示區域時觸發檔案選擇
+    const uploadHint = document.getElementById('upload-hint');
+    uploadHint.addEventListener('click', () => {
+        fileInput.click();
+    });
+
     function handlePointerDown(e) {
         // 如果點擊的是裁切框、去背區域或文字框，不觸發圖片移動
         if (e.target.classList.contains('cropper') ||
@@ -336,17 +348,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateTransform() {
-        // 計算縮放和旋轉後的位置偏移
-        const imgWidth = img.naturalWidth;
-        const imgHeight = img.naturalHeight;
-        const containerWidth = imageContainer.clientWidth;
-        const containerHeight = imageContainer.clientHeight;
+        // 計算容器和圖片的尺寸
+        const containerHeight = imageContainer.clientHeight - 40; // 減去內邊距
+        const imgRatio = img.naturalWidth / img.naturalHeight;
 
-        // 計算圖片在容器中的中心位置
-        const centerX = (containerWidth - imgWidth) / 2;
-        const centerY = (containerHeight - imgHeight) / 2;
+        // 根據高度計算適當的寬度
+        const appropriateHeight = containerHeight;
+        const appropriateWidth = appropriateHeight * imgRatio;
 
-        imageWrapper.style.transform = `translate(${currentX + centerX}px, ${currentY + centerY}px) rotate(${rotationAngle}deg) scale(${scale})`;
+        // 設置圖片包裝器的尺寸
+        imageWrapper.style.height = `${appropriateHeight}px`;
+        imageWrapper.style.width = `${appropriateWidth}px`;
+
+        // 應用變換
+        imageWrapper.style.transform = `translate(${currentX}px, ${currentY}px) rotate(${rotationAngle}deg) scale(${scale})`;
     }
 
     function resetTransform() {
@@ -458,9 +473,24 @@ function handleFileChange(e) {
 
 // 重置圖片容器
 function resetImageContainer() {
-    // 移除固定寬高設置，使用 CSS 中的 width: 100% 設置
+    // 移除之前的樣式設置
     imageWrapper.style.width = '';
     imageWrapper.style.height = '';
+
+    // 重置縮放和位置
+    scale = 1;
+    currentX = 0;
+    currentY = 0;
+    rotationAngle = 0;
+
+    // 更新變換
+    updateTransform();
+
+    // 更新縮放控制項
+    const zoomLevel = document.querySelector('.zoom-level');
+    if (zoomLevel) {
+        zoomLevel.textContent = '100%';
+    }
 }
 
 // 更新長寬比例
@@ -1324,5 +1354,46 @@ function clearTextBoxes() {
         erasers.forEach(eraser => {
             applyEraserToCanvas(eraser);
         });
+    }
+}
+
+// 處理拖曳進入
+function handleDragEnter(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    imageContainer.classList.add('drag-over');
+}
+
+// 處理拖曳經過
+function handleDragOver(e) {
+    e.preventDefault();
+    e.stopPropagation();
+}
+
+// 處理拖曳離開
+function handleDragLeave(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!e.relatedTarget || !imageContainer.contains(e.relatedTarget)) {
+        imageContainer.classList.remove('drag-over');
+    }
+}
+
+// 處理拖放
+function handleDrop(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    imageContainer.classList.remove('drag-over');
+
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        const file = files[0];
+        // 檢查是否為圖片檔案
+        if (file.type.startsWith('image/')) {
+            fileInput.files = files;
+            handleFileChange({ target: { files: files } });
+        } else {
+            alert('請上傳圖片檔案');
+        }
     }
 }

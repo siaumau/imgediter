@@ -2,7 +2,7 @@
     "title": "Multi-functional Image Editor & Cropper",
     "tabs": {
         "crop": "Crop Mode",
-        "erase": "Erase Mode",
+        "erase": "Paint Mode",
         "text": "Text Mode",
         "settings": "Settings"
     },
@@ -13,8 +13,8 @@
         "selectImage": "Select Image",
         "addCrop": "Add Crop Area",
         "clearCrop": "Clear Crop Areas",
-        "addEraser": "Add Erase Area",
-        "clearEraser": "Clear Erase Areas",
+        "addEraser": "Add Paint Area",
+        "clearEraser": "Clear Paint Areas",
         "addText": "Add Text Block",
         "clearText": "Clear Text Blocks",
         "cropAll": "Crop All and Download",
