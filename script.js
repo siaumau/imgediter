@@ -163,9 +163,6 @@ function initEditCanvas() {
 
     // 繪製原始圖片到 canvas
     editCtx.drawImage(img, 0, 0);
-
-    // 隱藏原始圖片
-    img.style.display = 'none';
 }
 
 // 更新透明度顯示
