@@ -574,40 +574,23 @@ function updateCustomRatio() {
 function addCropper() {
     if (!sourceImage) return;
 
+    // 獲取圖片的實際尺寸
     const imgWidth = img.naturalWidth;
     const imgHeight = img.naturalHeight;
 
-    let cropperWidth, cropperHeight, cropperX, cropperY;
-
-    // 如果有上一個裁切框，則使用其尺寸和比例
-    if (lastCropper) {
-        cropperWidth = lastCropper.width;
-        cropperHeight = lastCropper.height;
-        cropperX = ensureEven(Math.min(lastCropper.x + 30, imgWidth - cropperWidth - 10));
-        cropperY = ensureEven(Math.min(lastCropper.y + 30, imgHeight - cropperHeight - 10));
-    } else {
-        // 計算裁切框的初始大小，確保符合比例且是偶數像素
-        cropperWidth = Math.min(300, imgWidth / 2);
-        cropperHeight = cropperWidth / currentAspectRatio;
-
-        // 確保裁切框的尺寸是偶數像素
-        cropperWidth = ensureEven(cropperWidth);
-        cropperHeight = ensureEven(cropperHeight);
-
-        // 計算裁切框的初始位置，置中於圖片
-        cropperX = ensureEven((imgWidth - cropperWidth) / 2);
-        cropperY = ensureEven((imgHeight - cropperHeight) / 2);
-    }
+    // 計算裁切框的初始大小（以圖片寬度的30%為基準）
+    const cropperWidth = ensureEven(Math.min(300, imgWidth * 0.3));
+    const cropperHeight = ensureEven(cropperWidth / currentAspectRatio);
 
     const cropper = {
-        x: cropperX,
-        y: cropperY,
+        x: 0,
+        y: 0,
         width: cropperWidth,
         height: cropperHeight
     };
 
     croppers.push(cropper);
-    lastCropper = {...cropper}; // 保存最後一個裁切框的數據
+    lastCropper = {...cropper};
 
     createCropperElement(cropper, croppers.length - 1);
 
@@ -734,10 +717,12 @@ function createCropperElement(cropper, index) {
     cropperEl.className = 'cropper';
     cropperEl.dataset.index = index;
     cropperEl.dataset.type = 'cropper';
-    cropperEl.style.left = cropper.x + 'px';
-    cropperEl.style.top = cropper.y + 'px';
-    cropperEl.style.width = cropper.width + 'px';
-    cropperEl.style.height = cropper.height + 'px';
+
+    // 設置裁切框的位置和大小
+    cropperEl.style.left = '0px';
+    cropperEl.style.top = '0px';
+    cropperEl.style.width = `${cropper.width}px`;
+    cropperEl.style.height = `${cropper.height}px`;
 
     // 裁切框編號
     const indexEl = document.createElement('div');
