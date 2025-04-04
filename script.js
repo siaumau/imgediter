@@ -579,7 +579,7 @@ function addCropper() {
     const imgHeight = img.naturalHeight;
 
     // 計算裁切框的初始大小（以圖片寬度的30%為基準）
-    const cropperWidth = ensureEven(Math.min(300, imgWidth * 0.3));
+    const cropperWidth = ensureEven(Math.min(100, imgWidth * 0.3));
     const cropperHeight = ensureEven(cropperWidth / currentAspectRatio);
 
     const cropper = {
