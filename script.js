@@ -1308,8 +1308,16 @@ function cropAllAndDownload() {
         // 轉換 canvas 為圖片數據
         const imageData = tempCanvas.toDataURL('image/png');
 
-        // 將圖片數據添加到壓縮包
-        const fileName = `cropped_${index + 1}.png`;
+        // 使用時間戳記建立檔名
+        const now = new Date();
+        const timestamp = now.getFullYear() +
+                         String(now.getMonth() + 1).padStart(2, '0') +
+                         String(now.getDate()).padStart(2, '0') +
+                         '_' +
+                         String(now.getHours()).padStart(2, '0') +
+                         String(now.getMinutes()).padStart(2, '0') +
+                         String(now.getSeconds()).padStart(2, '0');
+        const fileName = `${timestamp}_${index + 1}.png`;
 
         // 處理 base64 數據
         const base64Data = imageData.replace(/^data:image\/png;base64,/, "");
@@ -1320,9 +1328,8 @@ function cropAllAndDownload() {
         // 當所有裁切完成，生成壓縮包並下載
         if (counter === croppers.length) {
             zip.generateAsync({type: 'blob'}).then(function(content) {
-                // 下載壓縮包
-                const originalFileName = fileInput.files[0].name.split('.')[0];
-                const zipName = `${originalFileName}_cropped.zip`;
+                // 下載壓縮包，使用時間戳記命名
+                const zipName = `cropped_${timestamp}.zip`;
 
                 // 創建下載連結
                 const a = document.createElement('a');
