@@ -578,16 +578,26 @@ function addCropper() {
     const imgWidth = img.naturalWidth;
     const imgHeight = img.naturalHeight;
 
-    // 計算裁切框的初始大小（以圖片寬度的30%為基準）
-    const cropperWidth = ensureEven(Math.min(100, imgWidth * 0.3));
-    const cropperHeight = ensureEven(cropperWidth / currentAspectRatio);
-
-    const cropper = {
-        x: 0,
-        y: 0,
-        width: cropperWidth,
-        height: cropperHeight
-    };
+    let cropper;
+    if (lastCropper) {
+        // 如果有最後一個裁切框的記錄，使用其尺寸
+        cropper = {
+            x: 0,
+            y: 0,
+            width: lastCropper.width,
+            height: lastCropper.height
+        };
+    } else {
+        // 如果沒有最後一個裁切框的記錄，使用預設尺寸
+        const cropperWidth = ensureEven(Math.min(100, imgWidth * 0.3));
+        const cropperHeight = ensureEven(cropperWidth / currentAspectRatio);
+        cropper = {
+            x: 0,
+            y: 0,
+            width: cropperWidth,
+            height: cropperHeight
+        };
+    }
 
     croppers.push(cropper);
     lastCropper = {...cropper};
