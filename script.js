@@ -727,6 +727,7 @@ function createCropperElement(cropper, index) {
     cropperEl.className = 'cropper';
     cropperEl.dataset.index = index;
     cropperEl.dataset.type = 'cropper';
+    cropperEl.tabIndex = 0; // 使元素可以接收鍵盤焦點
 
     // 設置裁切框的位置和大小
     cropperEl.style.left = '0px';
@@ -758,6 +759,58 @@ function createCropperElement(cropper, index) {
     cropperEl.addEventListener('mousedown', function(e) {
         if (e.target.className.includes('resizer')) return;
         startDrag(e, 'cropper');
+        // 當點擊裁切框時，設置焦點
+        cropperEl.focus();
+    });
+
+    // 添加雙擊事件監聽器
+    cropperEl.addEventListener('dblclick', function(e) {
+        // 防止事件冒泡
+        e.stopPropagation();
+
+        // 獲取當前裁切框的資訊
+        const currentCropper = croppers[index];
+
+        // 建立新的裁切框，位置稍微偏移
+        const newCropper = {
+            x: Math.min(currentCropper.x + 30, img.naturalWidth - currentCropper.width),
+            y: Math.min(currentCropper.y + 30, img.naturalHeight - currentCropper.height),
+            width: currentCropper.width,
+            height: currentCropper.height
+        };
+
+        // 將新裁切框添加到陣列中
+        croppers.push(newCropper);
+        lastCropper = {...newCropper};
+
+        // 建立新的裁切框元素
+        createCropperElement(newCropper, croppers.length - 1);
+
+        // 啟用相關按鈕
+        cropAllBtn.disabled = false;
+        clearCroppersBtn.disabled = false;
+    });
+
+    // 添加鍵盤事件監聽器
+    cropperEl.addEventListener('keydown', function(e) {
+        // 當按下 Delete 鍵時
+        if (e.key === 'Delete') {
+            e.preventDefault();
+            // 從陣列中移除該裁切框
+            croppers.splice(index, 1);
+            // 移除 DOM 元素
+            cropperEl.remove();
+            // 重新編號剩餘的裁切框
+            document.querySelectorAll('.cropper').forEach((el, i) => {
+                el.dataset.index = i;
+                el.querySelector('.cropper-index').textContent = i + 1;
+            });
+            // 如果沒有裁切框了，禁用相關按鈕
+            if (croppers.length === 0) {
+                cropAllBtn.disabled = true;
+                clearCroppersBtn.disabled = true;
+            }
+        }
     });
 
     imageWrapper.appendChild(cropperEl);
